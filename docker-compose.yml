@@ -7,6 +7,7 @@ services:
     container_name: domarchy
     volumes:
       - ./data:/data
+      - ./shared:/shared
       - /run/user/1000/pulse/native:/tmp/pulse.socket
     ports:
       - "5900:5900"

@@ -32,5 +32,5 @@ exec qemu-system-x86_64 \
     -audiodev pa,id=audio0,server=unix:/tmp/pulse.socket \
     -device ich9-intel-hda \
     -device hda-output,audiodev=audio0 \
-    -net user \
+    -net user,smb=/shared \
     -net nic
