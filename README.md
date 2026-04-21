@@ -44,3 +44,15 @@ omarchy-restart-hyprctl
 ```
 
 Now press `Super + F10` to toggle keyboard passthrough to the container.
+
+## Sharing Files
+
+The `shared/` folder in the project root is automatically mounted inside the container and exposed via Samba. You can access it from within the Omarchy guest without credentials.
+
+To connect from within the VM, mount the share:
+
+```
+smb://10.0.2.4/qemu
+```
+
+**N.B.** `10.0.2.4` is hardcoded by QEMU for the Samba share and will never change regardless of the container's IP.
