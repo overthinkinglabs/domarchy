@@ -22,6 +22,20 @@ else
     BOOT_ORDER="d"
 fi
 
+# Only wire up audio when the host actually passed a PulseAudio socket through.
+# QEMU aborts at startup if the pa backend cannot reach the socket, which is
+# what happens on hosts that have no PulseAudio to bind mount (macOS, Windows).
+AUDIO_ARGS=()
+if [[ -S /tmp/pulse.socket ]]; then
+    AUDIO_ARGS=(
+        -audiodev pa,id=audio0,server=unix:/tmp/pulse.socket
+        -device ich9-intel-hda
+        -device hda-output,audiodev=audio0
+    )
+else
+    echo "No PulseAudio socket at /tmp/pulse.socket, starting without audio."
+fi
+
 websockify --web /opt/novnc 8900 localhost:5900 &
 
 exec qemu-system-x86_64 \
@@ -31,8 +45,6 @@ exec qemu-system-x86_64 \
     -boot order=$BOOT_ORDER \
     -display vnc=:0 \
     -device VGA,edid=on,xres=1920,yres=1080,vgamem_mb=32 \
-    -audiodev pa,id=audio0,server=unix:/tmp/pulse.socket \
-    -device ich9-intel-hda \
-    -device hda-output,audiodev=audio0 \
+    "${AUDIO_ARGS[@]}" \
     -net user,smb=/shared \
     -net nic
